@@ -1,0 +1,41 @@
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SecCore
+  FILE_GUID                      = 385f25f8-58e0-4ae5-91b7-ac9f1c5e48c2 
+  MODULE_TYPE                    = SEC
+  VERSION_STRING                 = 1.0
+
+[Sources.common]
+  Asm/Start.S
+  SecStartup.c
+  Uart.c
+
+[Includes.common]
+  Include
+  Include/Loongson
+  Include/Loongson/Loongson2f
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Fuloong6003Pkg/Fuloong6003Pkg.dec 
+
+[LibraryClasses]
+  
+  
+[FixedPcd]
+  gFuloong6003TokenSpaceGuid.PcdFlashFdBase
+  gFuloong6003TokenSpaceGuid.PcdFlashFdSize
+  gFuloong6003TokenSpaceGuid.PcdFlashFvRecoveryBase
+  gFuloong6003TokenSpaceGuid.PcdFlashFvRecoverySize
+  gFuloong6003TokenSpaceGuid.PcdFlashFvMainBase
+  gFuloong6003TokenSpaceGuid.PcdFlashFvMainSize
+
+[BuildOptions]
+#  GCC:*_*_MIPS64_PP_FLAGS      = -include Library/PcdLib.h
+  GCC:*_*_MIPS64_CC_FLAGS	= -mno-abicalls
+  GCC:*_*_MIPS64_DLINK_FLAGS	= -T $(WORKSPACE)/Fuloong6003Pkg/Sec/ld.script
+
+ # GCC:*_*_MIPS64_DLINK_FLAGS	= -Ttext 0x80200000
+
+

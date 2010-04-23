@@ -1,0 +1,3 @@
+#define DDR2_CTRL_REG_NUM	29
+
+#define DDR2_CTRL_REG_BASE	0x0ffffe00	

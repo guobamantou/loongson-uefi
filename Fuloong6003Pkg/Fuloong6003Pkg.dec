@@ -1,0 +1,37 @@
+[Defines]
+ DEC_SPECIFICATION		= 0x00010005
+ PACKAGE_NAME			= Fuloong6003Pkg
+ PACKAGE_GUID			= f52a1bb4-852c-4e7c-9d29-1058edd53429
+ PACKAGE_VERSION		= 0.1
+
+[Includes.common]
+ Include			#Include at the root of this package
+ Include/Loongson
+ Include/Loongson/Loongson2f
+
+[Guids.common]
+ gFuloong6003TokenSpaceGuid	= { 0xEDABF299, 0xFEA6, 0x4151, { 0x9B, 0xA9, 0x4A, 0x7D, 0x4A, 0xCC, 0x6F, 0x32 } }
+
+#[PcdsEnumerations.common]
+
+[PcdsFeatureFlag.common]
+
+[PcdsFixedAtBuild.common]
+ #Fd Base address : 0xBFC00000
+ #Fd Size         : 0x80000    : 512 KB
+ gFuloong6003TokenSpaceGuid.PcdFlashFdBase|0xBFC00000|UINT32|0x00000001
+ gFuloong6003TokenSpaceGuid.PcdFlashFdSize|0x00080000|UINT32|0x00000002
+
+ #FvRecoverySize  : 0x10000    : 64 KB
+ #FvRecoveryBase  : 0x0(offset)
+ gFuloong6003TokenSpaceGuid.PcdFlashFvRecoverySize|0x00010000|UINT32|0x00000003
+ gFuloong6003TokenSpaceGuid.PcdFlashFvRecoveryBase|0x00000000|UINT32|0x00000004
+ 
+ #FvMainSize      : 0x60000         : 512*(3/4) KB
+ #FvMainBase      : 0x10000(offset) 
+ gFuloong6003TokenSpaceGuid.PcdFlashFvMainSize|0x00060000|UINT32|0x00000005
+ gFuloong6003TokenSpaceGuid.PcdFlashFvMainBase|0x00010000|UINT32|0x00000006
+
+
+
+

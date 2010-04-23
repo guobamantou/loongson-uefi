@@ -1,0 +1,426 @@
+/*
+Copyright - 
+
+Revision:
+    2010.04.13 - Source created         - wang.qch
+
+NOTE:  This tool is MIPS specific
+       Used to adjust the region ZeroVector of FV 
+       which aligns at the boot address:0xbfc00000
+
+       There is a premise for using this tool:
+       that the SecCore resides in the FV which start at offset 0x0 of the FD file.
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "RecalculateFvZeroVector.h"
+
+#define BACKUP_EXTENSION    ".bak.ZeroVector"
+#define BRANCH_INSTRUCTION    0x10000000
+#define MAX_FV_NUM             16
+#define MAX_FFS_NUM            32
+
+#define MAX_TYPE_STR_LENGTH    96
+
+
+typedef struct{
+    FFS_FILE_INFO   *Next;
+    UINTN           Offset;         //from this ffs file
+}SECTION_INFO;
+
+typedef struct{
+    FFS_FILE_INFO   *Next;          //Linked list, NULL terminated.
+    UINTN           Offset;         //from this fv
+    SECTION_INFO    *Section;       //First node of the linked list, NULL means none.
+}FFS_FILE_INFO;
+
+typedef struct{
+    FV_INFO         *Next;          //Linked list, NULL terminated.
+    UINTN           Offset;         //from this fd
+    FFS_FILE_INFO   *FfsFileInfo;   //first node of the linked list, NULL means none.
+}FV_INFO;
+
+FV_INFO *gFdInfo;
+
+
+
+UINTN    gFileSize = 0;
+
+
+void Usage(void){
+    printf("\nRecalculateFvZeroVector:\n");
+    printf("\tStore a JMP instruction in a FV.ZeroVector for JUMPing to the SEC Core Entry Point\n");
+    printf("Usage:\n");
+    printf("\tRecalculateFvZeroVector FdFileName");
+}
+
+BOOLEAN FindSecCoreTeImage(CHAR8 *FileBuffer, UINTN *Offset){
+    EFI_FIRMWARE_VOLUME_HEADER    *FvHdr;
+    EFI_FFS_FILE_HEADER            *FfsHdr;
+    EFI_COMMON_SECTION_HEADER    *ComSectionHdr;
+    EFI_TE_IMAGE_HEADER            *TeImageHdr;
+    
+    CHAR8                        *Ptr;
+    CHAR8                        *FfsEnd;
+    UINTN                        FfsSize;
+    UINTN                        SectionSize;
+
+    Ptr = NULL;
+    FvHdr = (EFI_FIRMWARE_VOLUME_HEADER *)FileBuffer;
+    if(FvHdr->Signature != EFI_FVH_SIGNATURE){
+        printf("\nInvalid FV data offered\n");
+        return FALSE;
+    }
+    //
+    //looking for the Sec Core FFS in this FV
+    Ptr = FileBuffer + FvHdr->HeaderLength;
+    do{
+
+        FfsHdr = (EFI_FFS_FILE_HEADER *)Ptr;
+        FfsSize = ((UINTN)(FfsHdr->Size[0]))|
+                  (((UINTN)(FfsHdr->Size[1]))<<8)|
+                  (((UINTN)(FfsHdr->Size[2]))<<16);
+        
+        if(FfsHdr->Type == EFI_FV_FILETYPE_SECURITY_CORE){
+            break;
+        }        
+        
+        Ptr += FfsSize;    
+        
+    }while(Ptr < (FileBuffer + FvHdr->HeaderLength));
+    
+    //make sure we have it.
+    if(FfsHdr->Type != EFI_FV_FILETYPE_SECURITY_CORE){
+        printf("\nCannot find SecCore FFS in this FV\n");
+        return FALSE;
+    }
+    //
+    //    Sec Core FFS file found
+    //  looking for SecCore Te Section
+    //    we asume the SEC_CORE_FFS contains only one TE Section where the Sec Code resides.
+    FfsEnd = Ptr + FfsSize;
+    Ptr += sizeof(EFI_FFS_FILE_HEADER);
+    do{
+        ComSectionHdr = (EFI_COMMON_SECTION_HEADER *)Ptr;
+        SectionSize =     ((UINTN)(ComSectionHdr->Size[0]))|
+                          (((UINTN)(ComSectionHdr->Size[1]))<<8)|
+                          (((UINTN)(ComSectionHdr->Size[2]))<<16);
+        
+        if(ComSectionHdr->Type == EFI_SECTION_TE){
+            printf("\nTe Section Found");
+            break;
+        }
+
+        Ptr += SectionSize;
+    }while(Ptr < FfsEnd);
+    if(ComSectionHdr->Type != EFI_SECTION_TE){
+        printf("\nCannot find Sec Core Te Section\n");
+        return FALSE;
+    }
+    //
+    //Sec Core Te Section Found
+    //get the entry point of the image
+    TeImageHdr = (EFI_TE_IMAGE_HEADER *)(Ptr + sizeof(EFI_TE_SECTION));
+    *Offset = TeImageHdr->AddressOfEntryPoint - 
+              TeImageHdr->StrippedSize        + 
+              sizeof(EFI_TE_IMAGE_HEADER)     +
+              sizeof(EFI_TE_SECTION)          +
+              Ptr                             -
+              FileBuffer;
+    
+    //for debug    >>
+    printf("\nOffset from FD to entry point: 0x%x\n", *Offset);
+    //for debug    <<
+
+    return TRUE;    
+
+}
+
+
+BOOLEAN ShowFvInfo(EFI_FIRMWARE_VOLUME_HEADER *FvHdr){
+
+     // UINT8                     ZeroVector[16];
+     // EFI_GUID                  FileSystemGuid;
+     // UINT64                    FvLength;
+     // UINT32                    Signature;
+     // EFI_FVB_ATTRIBUTES        Attributes;
+     // UINT16                    HeaderLength;
+     // UINT16                    Checksum;
+     // UINT16                    ExtHeaderOffset;
+      //U/INT8                     Reserved[1];
+      //UINT8                     Revision;
+      //EFI_FV_BLOCK_MAP_ENTRY    BlockMap[1];
+    
+    printf("\n\t\tGuid:\t%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",    FvHdr->FileSystemGuid.Data1,
+                                                                FvHdr->FileSystemGuid.Data2,
+                                                                FvHdr->FileSystemGuid.Data3,
+                                                                FvHdr->FileSystemGuid.Data4[0],
+                                                                FvHdr->FileSystemGuid.Data4[1],
+                                                                FvHdr->FileSystemGuid.Data4[2],
+                                                                FvHdr->FileSystemGuid.Data4[3],
+                                                                FvHdr->FileSystemGuid.Data4[4],
+                                                                FvHdr->FileSystemGuid.Data4[5],
+                                                                FvHdr->FileSystemGuid.Data4[6],
+                                                                FvHdr->FileSystemGuid.Data4[7]
+    );
+    printf("\n\t\tLength:\t0x%x",FvHdr->FvLength);
+    printf("\n\t\tRevision:\t%d",FvHdr->Revision);
+    printf("\n\t\tHdrLength:\t0x%x",FvHdr->HeaderLength);
+    if(FvHdr->ExtHeaderOffset != 0){
+        printf("\n\tThis Fv has Extended Header");        
+    }
+    return TRUE;
+}
+
+BOOLEAN ShowFvContent(EFI_FIRMWARE_VOLUME_HEADER *FvHdr, UINTN FvOffset){
+    EFI_FFS_FILE_HEADER    *FfsHdr;
+    EFI_FFS_FILE_HEADER2    *FfsHdr2;
+    EFI_FIRMWARE_VOLUME_EXT_HEADER    *FvExtHdr;
+    
+    UINT8    *p;
+    UINTN    FvLeng;
+    UINTN    FileSumLeng;
+    UINTN    CurrentLeng;
+    UINTN    FileCount;
+
+    p = (UINT8 *)FvHdr;
+    
+    if(FvHdr->ExtHeaderOffset != 0){
+        printf("\n\tThis Fv has Extended Header");
+        FvExtHdr = (EFI_FIRMWARE_VOLUME_EXT_HEADER *)(p + FvHdr->ExtHeaderOffset);
+        FfsHdr = (EFI_FFS_FILE_HEADER *)(p + FvHdr->ExtHeaderOffset + FvExtHdr->ExtHeaderSize);
+    }
+    else{
+        printf("\n\tThis Fv doesn't have Extende Header");
+        FfsHdr = (EFI_FFS_FILE_HEADER *)(p + FvHdr->HeaderLength);
+    }
+    p = (UINT8 *)FfsHdr;
+    // 8 bytes aligned
+    p = (UINT8 *)((UINTN)(p + 0x7) & (~0x7));
+
+    FfsHdr = (EFI_FFS_FILE_HEADER *)p;
+    FileSumLeng = 0;
+    FileCount = 0;
+    do{
+        printf("\n\tFFS[%d] :", FileCount + 1);
+        if(!(FfsHdr->Attributes & FFS_ATTRIB_LARGE_FILE)){
+            printf("\n\tThis FFS file doesN'T have large file attribute set");
+            CurrentLeng = ((UINTN)(FfsHdr->Size[0]) | (UINTN)(FfsHdr->Size[1] << 8) | (UINTN)(FfsHdr->Size[2] << 16));
+        }
+        else{
+            printf("\n\tThis FFS file has large file attribute set");
+            FfsHdr2 = (EFI_FFS_FILE_HEADER2 *)FfsHdr;
+            CurrentLeng= (UINTN)FfsHdr2->ExtendedSize  << 24;
+        }
+        FileSumLeng += CurrentLeng;        
+        switch(FfsHdr->Type){
+            case EFI_FV_FILETYPE_ALL:
+                printf("\n\t\tType:\tEFI_FV_FILETYPE_ALL");
+                break;
+            case EFI_FV_FILETYPE_RAW:
+                printf("\n\t\tType:\tEFI_FV_FILETYPE_RAW");
+                break;
+            case EFI_FV_FILETYPE_FREEFORM:
+                printf("\n\t\tType:\tEFI_FV_FILETYPE_FREEFORM");
+                break;
+            case EFI_FV_FILETYPE_SECURITY_CORE:
+                printf("\n\t\tType:\tEFI_FV_FILETYPE_SECURITY_CORE");
+                break;
+            case EFI_FV_FILETYPE_PEI_CORE:
+                printf("\n\t\tType:\tEFI_FV_FILETYPE_PEI_CORE");
+                break;
+            case EFI_FV_FILETYPE_DXE_CORE:
+                printf("\n\t\tType:\tEFI_FV_FILETYPE_DXE_CORE");
+                break;
+            case EFI_FV_FILETYPE_PEIM:
+                printf("\n\t\tType:\tEFI_FV_FILETYPE_PEIM");
+                break;
+            case EFI_FV_FILETYPE_DRIVER:
+                printf("\n\t\tType:\tEFI_FV_FILETYPE_DRIVER");
+                break;
+            case EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER:
+                printf("\n\t\tType:\tEFI_FV_FILETYPE_COMBINED_PEIM_DRIVER");
+                break;
+            case EFI_FV_FILETYPE_APPLICATION:
+                printf("\n\t\tType:\tEFI_FV_FILETYPE_APPLICATION");
+                break;
+            case EFI_FV_FILETYPE_SMM:
+                printf("\n\t\tType:\tEFI_FV_FILETYPE_SMM");
+                break;
+            case EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE:
+                printf("\n\t\tType:\tEFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE");
+                break;
+            case EFI_FV_FILETYPE_COMBINED_SMM_DXE:
+                printf("\n\t\tType:\tEFI_FV_FILETYPE_COMBINED_SMM_DXE");
+                break;
+            case EFI_FV_FILETYPE_SMM_CORE:
+                printf("\n\t\tType:\tEFI_FV_FILETYPE_SMM_CORE");
+                break;
+            case EFI_FV_FILETYPE_OEM_MIN:
+                printf("\n\t\tType:\tEFI_FV_FILETYPE_OEM_MIN");
+                break;
+            case EFI_FV_FILETYPE_OEM_MAX:
+                printf("\n\t\tType:\tEFI_FV_FILETYPE_OEM_MAX");
+                break;
+            case EFI_FV_FILETYPE_DEBUG_MIN:
+                printf("\n\t\tType:\tEFI_FV_FILETYPE_DEBUG_MIN");
+                break;
+            case EFI_FV_FILETYPE_DEBUG_MAX:
+                printf("\n\t\tType:\tEFI_FV_FILETYPE_DEBUG_MAX");
+                break;
+            case EFI_FV_FILETYPE_FFS_MIN:
+                printf("\n\t\tType:\tEFI_FV_FILETYPE_FFS_MIN");
+                printf("\n\t\t     \tEFI_FV_FILETYPE_FFS_PAD");
+                break;                
+            case EFI_FV_FILETYPE_FFS_MAX:
+                printf("\n\t\tType:\tEFI_FV_FILETYPE_FFS_MAX");
+                break;
+            default:
+                printf("\n\t\tType:\tUnrecgnized type");
+
+        }
+        printf("\n\t\tOffset:\t0x%08x",(UINTN)FfsHdr - (UINTN)FvHdr + FvOffset);
+        printf("\n\t\tGuid:\t%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",    FfsHdr->Name.Data1,
+                                                                FfsHdr->Name.Data2,
+                                                                FfsHdr->Name.Data3,
+                                                                FfsHdr->Name.Data4[0],
+                                                                FfsHdr->Name.Data4[1],
+                                                                FfsHdr->Name.Data4[2],
+                                                                FfsHdr->Name.Data4[3],
+                                                                FfsHdr->Name.Data4[4],
+                                                                FfsHdr->Name.Data4[5],
+                                                                FfsHdr->Name.Data4[6],
+                                                                FfsHdr->Name.Data4[7]
+        );
+        printf("\n\t\tLength:\t0x%0x",CurrentLeng);
+        printf("\n\t\tEnd:\t0x%x",(UINTN)FfsHdr - (UINTN)FvHdr + FvOffset + CurrentLeng);
+        if((UINTN)FfsHdr - (UINTN)FvHdr + FvOffset + CurrentLeng >= gFileSize)
+            break;
+        FfsHdr = (EFI_FFS_FILE_HEADER *)((UINT8 *)FfsHdr + CurrentLeng);
+        p = (UINT8 *)FfsHdr;
+        p = (UINT8 *)((UINTN)(p + 0x7) & (~0x7));
+        FfsHdr = (EFI_FFS_FILE_HEADER *)p;
+        FileCount ++;
+        if (FileCount > MAX_FFS_NUM)
+            break;
+    }while(((FileSumLeng + 0x7)&(~0x7)) < FvHdr->FvLength);
+    
+    return TRUE;
+    
+}
+
+int main(int Argc, char *Argv[]){
+    FILE     *fp;
+    CHAR8    *FileBuffer;
+    CHAR8    *p;
+    UINTN    FileSize;
+    UINTN    SecTeOffset;
+    UINTN    ReadSize;
+    INTN     Status;
+    UINTN    Index;
+    //
+    //elements of this array denotes the start position of a FV
+    //if an element's is equal to FD_SIZE, it means the termination of the significant value
+    UINTN    FvsOffset[MAX_FV_NUM];
+    UINTN    FvNum;
+
+    EFI_FIRMWARE_VOLUME_HEADER    *FvHdr;
+
+	printf("\n");
+    
+    if (Argc <=1 ){
+        Usage();
+        return -1;
+    }
+    
+    fp = NULL;
+    FileBuffer = NULL;
+    
+    fp = fopen(Argv[1], "r+b");
+    if (fp == NULL){
+        printf("\nCannot open file: %s, operation aborted", Argv[1]);
+        Status = -1;
+        goto _EXIT_POINT;
+    }
+
+    fseek(fp, 0L, SEEK_END);
+    FileSize = ftell(fp);
+    fseek(fp, 0L, SEEK_SET);
+    gFileSize = FileSize;    
+
+    FileBuffer = (CHAR8 *)malloc(FileSize);
+    if (FileBuffer == NULL){
+        printf("\nOut of resources.\n");
+        Status = -1;
+        goto _EXIT_POINT;
+    }
+    ReadSize = fread(FileBuffer, 1, FileSize, fp);
+    if(FileSize != ReadSize){
+        printf("\nRead file error. Filesize: %d\tReadSize: %d\n", FileSize,ReadSize);
+        Status = -1;
+        goto _EXIT_POINT;
+    }
+    
+    fclose(fp);
+    fp = NULL;
+
+    for(p = FileBuffer, Index = 0, FvNum = 0; Index < MAX_FV_NUM; Index ++){
+        FvHdr = (EFI_FIRMWARE_VOLUME_HEADER *)p;
+        if(FvHdr->Signature != EFI_FVH_SIGNATURE)
+            break;
+        FvNum ++;
+        FvsOffset[Index] = (UINTN)(p - FileBuffer);
+        printf("\nOffset = 0x%08x",FvsOffset[Index]);
+        p += (UINTN)FvHdr->FvLength;
+        if ( p - FileBuffer >= FileSize)
+            break;
+    }
+	
+    p = NULL;
+    if (Index > MAX_FV_NUM){
+        printf("\nInvalid Fv number : 0x%x", Index);
+        printf("\nthe Number of fv should be no more than 0x%x",MAX_FV_NUM);
+        goto _EXIT_POINT;
+    }
+    printf("\n");
+    printf("\nThis FD file contains %d FV region",FvNum);
+    for(Index = 0, p = FileBuffer; Index < FvNum; Index ++){
+        FvHdr = (EFI_FIRMWARE_VOLUME_HEADER *)(p + FvsOffset[Index]);
+        if(FvHdr->Signature != EFI_FVH_SIGNATURE)
+            break;
+        //printf("\n\tFV[%d] offset :\t0x%08x",Index,FvsOffset[Index]);
+        printf("\n\tFV[%d] offset :",Index);
+        printf("\t0x%08x",FvsOffset[Index]);
+        ShowFvInfo(FvHdr);        
+    }
+    printf("\n");
+
+    for(Index = 0, p = FileBuffer; Index < FvNum; Index ++){
+        FvHdr = (EFI_FIRMWARE_VOLUME_HEADER *)(p + FvsOffset[Index]);
+        if(FvHdr->Signature != EFI_FVH_SIGNATURE)
+            break;
+        printf("\nFV[%d] Contains:",Index);
+        ShowFvContent(FvHdr, FvsOffset[Index]);
+    }
+    printf("\n");
+
+    Status = 0;
+    
+_EXIT_POINT:
+    if(fp != NULL){
+        fclose(fp);
+        fp = NULL;
+        //printf("\nFile Closed\n");
+    }
+    if(FileBuffer != NULL){
+        free(FileBuffer);
+        FileBuffer = NULL;
+        //printf("\nBuffer Freed\n");
+    }
+    printf("\nreturn status : %d\n",Status);
+	printf("\n");
+    return Status;    
+}

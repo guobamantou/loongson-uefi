@@ -1,0 +1,146 @@
+Loading previous configuration from $WORKSPACE/Conf/BuildEnv.sh
+WORKSPACE: /home/guobamantou/Desktop/edk2
+EDK_TOOLS_PATH: /home/guobamantou/Desktop/edk2/BaseTools/
+./build.sh: line 16: [: =: 需要单个参数
+mkdir: 无法创建目录 “/home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/TOOLS”: 没有该文件或目录
+Building tools ...
+gcc GeneratePad.c -o GeneratePad
+GeneratePad.c: In function ‘main’:
+GeneratePad.c:139: warning: incompatible implicit declaration of built-in function ‘malloc’
+GeneratePad.c:165: warning: incompatible implicit declaration of built-in function ‘free’
+cp: 无法创建普通文件“/home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/TOOLS”: 没有该文件或目录
+gcc RecalculateFvZeroVector.c -I /home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Tools/RecalculateFvZeroVector -o RecalculateFvZeroVector
+RecalculateFvZeroVector.c: In function ‘FindSecCoreTeImage’:
+RecalculateFvZeroVector.c:92: warning: cast from pointer to integer of different size
+RecalculateFvZeroVector.c:92: warning: cast to pointer from integer of different size
+RecalculateFvZeroVector.c:154: warning: format ‘%x’ expects type ‘unsigned int’, but argument 2 has type ‘UINTN’
+RecalculateFvZeroVector.c: In function ‘CalculateSum16’:
+RecalculateFvZeroVector.c:178: warning: cast from pointer to integer of different size
+RecalculateFvZeroVector.c: In function ‘main’:
+RecalculateFvZeroVector.c:300: warning: format ‘%d’ expects type ‘int’, but argument 2 has type ‘UINTN’
+RecalculateFvZeroVector.c:300: warning: format ‘%d’ expects type ‘int’, but argument 3 has type ‘UINTN’
+RecalculateFvZeroVector.c:371: warning: format ‘%d’ expects type ‘int’, but argument 2 has type ‘INTN’
+cp: 无法创建普通文件“/home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/TOOLS”: 没有该文件或目录
+Tools built.
+rm -rf /home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/Exception/Build
+mkdir /home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/Exception/Build
+mipsel-linux-gnu-gcc -E /home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/Exception/Asm/Exception.S -I /home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/Exception/../../Include -I /home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/Exception/../../Include/Loongson/ -I /home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/Exception/../../Include/Loongson/Loongson2f/ -o Build/Exception.s
+mipsel-linux-gnu-as Build/Exception.s -o Build/Exception.o
+mipsel-linux-gnu-ld -e _ModuleEntryPoint -u _ModuleEntryPoint -T /home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/Exception/ld.script Build/Exception.o -o Build/Exception
+mipsel-linux-gnu-objcopy -O binary Build/Exception /home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/Exception/Exception.bin
+./build.sh: line 40: /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/TOOLS/GeneratePad: 没有该文件或目录
+Standard build process start...
+09:30:19, Apr.15 2010 [Linux-2.6.31-16-generic-i686-with-Ubuntu-9.10-karmic]
+
+WORKSPACE                = /home/guobamantou/Desktop/edk2
+ECP_SOURCE               = /home/guobamantou/Desktop/edk2/EdkCompatibilityPkg
+EDK_SOURCE               = /home/guobamantou/Desktop/edk2/EdkCompatibilityPkg
+EFI_SOURCE               = /home/guobamantou/Desktop/edk2/EdkCompatibilityPkg
+EDK_TOOLS_PATH           = /home/guobamantou/Desktop/edk2/BaseTools/
+
+TARGET_ARCH              = MIPS64
+TARGET                   = DEBUG
+TOOL_CHAIN_TAG           = MIPSELFGCC
+
+Active Platform          = /home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Fuloong6003Pkg.dsc
+Flash Image Definition   = /home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Fuloong6003Pkg.fdf
+
+Processing meta-data . done!
+Generating code . done!
+Generating makefile . done!
+make[1]: 正在进入目录 `/home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64'
+Building ... /home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Fuloong6003Pkg.dsc [MIPS64]
+make[2]: 正在进入目录 `/home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64'
+Building ... /home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/SecCore.inf [MIPS64]
+"/opt/cross-tools/bin//mipsel-linux-gnu-gcc" -mips3 -E -x assembler-with-cpp -include /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/DEBUG/AutoGen.h -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/Asm -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec -I/home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/DEBUG -I/home/guobamantou/Desktop/edk2/MdePkg -I/home/guobamantou/Desktop/edk2/MdePkg/Include -I/home/guobamantou/Desktop/edk2/MdePkg/Include/MIPS64 -I/home/guobamantou/Desktop/edk2/MdePkg/Include/MIPS64/include -I/home/guobamantou/Desktop/edk2/MdeModulePkg -I/home/guobamantou/Desktop/edk2/MdeModulePkg/Include -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Include -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Include/Loongson -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Include/Loongson/Loongson2f /home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/Asm/Start.S > /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/OUTPUT/Asm/Start.i
+Trim --source-code -o /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/OUTPUT/Asm/Start.iii /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/OUTPUT/Asm/Start.i
+"/opt/cross-tools/bin//mipsel-linux-gnu-as"  -o /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/OUTPUT/Asm/Start.obj -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/Asm -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec -I/home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/DEBUG -I/home/guobamantou/Desktop/edk2/MdePkg -I/home/guobamantou/Desktop/edk2/MdePkg/Include -I/home/guobamantou/Desktop/edk2/MdePkg/Include/MIPS64 -I/home/guobamantou/Desktop/edk2/MdePkg/Include/MIPS64/include -I/home/guobamantou/Desktop/edk2/MdeModulePkg -I/home/guobamantou/Desktop/edk2/MdeModulePkg/Include -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Include -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Include/Loongson -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Include/Loongson/Loongson2f /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/OUTPUT/Asm/Start.iii
+"/opt/cross-tools/bin//mipsel-linux-gnu-gcc" -mips3 -g -fshort-wchar -fno-strict-aliasing -Os -Wall -Wstrict-prototypes -Wno-trigraphs -Werror-implicit-function-declaration -Wstrict-aliasing -fno-common -ffreestanding -fno-builtin -pipe -nostdlib -c -include /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/DEBUG/AutoGen.h -DSTRING_ARRAY_NAME=SecCoreStrings -mno-abicalls -o /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/OUTPUT/./SecStartup.obj -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/Asm -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec -I/home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/DEBUG -I/home/guobamantou/Desktop/edk2/MdePkg -I/home/guobamantou/Desktop/edk2/MdePkg/Include -I/home/guobamantou/Desktop/edk2/MdePkg/Include/MIPS64 -I/home/guobamantou/Desktop/edk2/MdePkg/Include/MIPS64/include -I/home/guobamantou/Desktop/edk2/MdeModulePkg -I/home/guobamantou/Desktop/edk2/MdeModulePkg/Include -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Include -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Include/Loongson -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Include/Loongson/Loongson2f /home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/SecStartup.c
+/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/SecStartup.c: In function 'SecStartup':
+/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/SecStartup.c:9: warning: pointer targets in passing argument 1 of 'uart_puts' differ in signedness
+/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/SecStartup.c:2: note: expected 'const u8 *' but argument is of type 'char *'
+/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/SecStartup.c:8: warning: 'i' is used uninitialized in this function
+"echo" Symbol renaming not needed for /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/OUTPUT/./SecStartup.obj
+Symbol renaming not needed for /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/OUTPUT/./SecStartup.obj
+"/opt/cross-tools/bin//mipsel-linux-gnu-gcc" -mips3 -g -fshort-wchar -fno-strict-aliasing -Os -Wall -Wstrict-prototypes -Wno-trigraphs -Werror-implicit-function-declaration -Wstrict-aliasing -fno-common -ffreestanding -fno-builtin -pipe -nostdlib -c -include /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/DEBUG/AutoGen.h -DSTRING_ARRAY_NAME=SecCoreStrings -mno-abicalls -o /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/OUTPUT/./Uart.obj -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/Asm -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec -I/home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/DEBUG -I/home/guobamantou/Desktop/edk2/MdePkg -I/home/guobamantou/Desktop/edk2/MdePkg/Include -I/home/guobamantou/Desktop/edk2/MdePkg/Include/MIPS64 -I/home/guobamantou/Desktop/edk2/MdePkg/Include/MIPS64/include -I/home/guobamantou/Desktop/edk2/MdeModulePkg -I/home/guobamantou/Desktop/edk2/MdeModulePkg/Include -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Include -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Include/Loongson -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Include/Loongson/Loongson2f /home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/Uart.c
+/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/Uart.c:9: warning: data definition has no type or storage class
+/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/Uart.c:9: warning: type defaults to 'int' in declaration of 'UART_BASE'
+/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/Uart.c:9: warning: initialization from incompatible pointer type
+"echo" Symbol renaming not needed for /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/OUTPUT/./Uart.obj
+Symbol renaming not needed for /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/OUTPUT/./Uart.obj
+"/opt/cross-tools/bin//mipsel-linux-gnu-gcc" -mips3 -g -fshort-wchar -fno-strict-aliasing -Os -Wall -Wstrict-prototypes -Wno-trigraphs -Werror-implicit-function-declaration -Wstrict-aliasing -fno-common -ffreestanding -fno-builtin -pipe -nostdlib -c -include /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/DEBUG/AutoGen.h -DSTRING_ARRAY_NAME=SecCoreStrings -mno-abicalls -o /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/OUTPUT/./AutoGen.obj -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/Asm -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec -I/home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/DEBUG -I/home/guobamantou/Desktop/edk2/MdePkg -I/home/guobamantou/Desktop/edk2/MdePkg/Include -I/home/guobamantou/Desktop/edk2/MdePkg/Include/MIPS64 -I/home/guobamantou/Desktop/edk2/MdePkg/Include/MIPS64/include -I/home/guobamantou/Desktop/edk2/MdeModulePkg -I/home/guobamantou/Desktop/edk2/MdeModulePkg/Include -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Include -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Include/Loongson -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Include/Loongson/Loongson2f /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/DEBUG/AutoGen.c
+"echo" Symbol renaming not needed for /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/OUTPUT/./AutoGen.obj
+Symbol renaming not needed for /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/OUTPUT/./AutoGen.obj
+"/opt/cross-tools/bin//mipsel-linux-gnu-ar" -cr /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/OUTPUT/SecCore.lib  @/home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/OUTPUT/object_files.lst
+"/opt/cross-tools/bin//mipsel-linux-gnu-ld" -o /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/DEBUG/SecCore.dll -melf32ltsmip -nostdlib --entry _ModuleEntryPoint -u _ModuleEntryPoint -T /home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/ld.script -\(  @/home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/OUTPUT/static_library_files.lst -\)
+"/opt/cross-tools/bin//mipsel-linux-gnu-objcopy"  /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/DEBUG/SecCore.dll
+/opt/cross-tools/bin//mipsel-linux-gnu-objcopy --only-keep-debug /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/DEBUG/SecCore.dll /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/SecCore.debug
+/opt/cross-tools/bin//mipsel-linux-gnu-objcopy --strip-unneeded /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/DEBUG/SecCore.dll
+/opt/cross-tools/bin//mipsel-linux-gnu-objcopy --add-gnu-debuglink=/home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/SecCore.debug /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/DEBUG/SecCore.dll
+GenFw -e SEC -o /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/DEBUG/SecCore.efi /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/DEBUG/SecCore.dll
+elf in mips format!cp -f /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/DEBUG/SecCore.efi /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/OUTPUT
+cp -f /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/DEBUG/SecCore.efi /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64
+cp -f /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/DEBUG/*.map /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/OUTPUT
+cp: 无法 stat “/home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/DEBUG/*.map”: 没有该文件或目录
+make[2]: [/home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/SecCore/DEBUG/SecCore.efi] 错误 1 (忽略)
+make[2]:正在离开目录 `/home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64'
+make[2]: 正在进入目录 `/home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64'
+Building ... /home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/Exception/Exception.inf [MIPS64]
+"/opt/cross-tools/bin//mipsel-linux-gnu-gcc" -mips3 -E -x assembler-with-cpp -include /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/Exception/Exception/DEBUG/AutoGen.h -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/Exception/Asm -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/Exception -I/home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/Exception/Exception/DEBUG -I/home/guobamantou/Desktop/edk2/MdePkg -I/home/guobamantou/Desktop/edk2/MdePkg/Include -I/home/guobamantou/Desktop/edk2/MdePkg/Include/MIPS64 -I/home/guobamantou/Desktop/edk2/MdePkg/Include/MIPS64/include -I/home/guobamantou/Desktop/edk2/MdeModulePkg -I/home/guobamantou/Desktop/edk2/MdeModulePkg/Include -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Include -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Include/Loongson -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Include/Loongson/Loongson2f /home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/Exception/Asm/Exception.S > /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/Exception/Exception/OUTPUT/Asm/Exception.i
+Trim --source-code -o /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/Exception/Exception/OUTPUT/Asm/Exception.iii /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/Exception/Exception/OUTPUT/Asm/Exception.i
+"/opt/cross-tools/bin//mipsel-linux-gnu-as"  -o /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/Exception/Exception/OUTPUT/Asm/Exception.obj -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/Exception/Asm -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Sec/Exception -I/home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/Exception/Exception/DEBUG -I/home/guobamantou/Desktop/edk2/MdePkg -I/home/guobamantou/Desktop/edk2/MdePkg/Include -I/home/guobamantou/Desktop/edk2/MdePkg/Include/MIPS64 -I/home/guobamantou/Desktop/edk2/MdePkg/Include/MIPS64/include -I/home/guobamantou/Desktop/edk2/MdeModulePkg -I/home/guobamantou/Desktop/edk2/MdeModulePkg/Include -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Include -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Include/Loongson -I/home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Include/Loongson/Loongson2f /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/Exception/Exception/OUTPUT/Asm/Exception.iii
+"/opt/cross-tools/bin//mipsel-linux-gnu-ar" -cr /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/Exception/Exception/OUTPUT/Exception.lib  @/home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/Exception/Exception/OUTPUT/object_files.lst
+"/opt/cross-tools/bin//mipsel-linux-gnu-ld" -o /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/Exception/Exception/DEBUG/Exception.dll -melf32ltsmip -nostdlib --entry _ModuleEntryPoint -u _ModuleEntryPoint -Ttext 0xbfc00200 -\(  @/home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/Exception/Exception/OUTPUT/static_library_files.lst -\)
+"/opt/cross-tools/bin//mipsel-linux-gnu-objcopy"  /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/Exception/Exception/DEBUG/Exception.dll
+/opt/cross-tools/bin//mipsel-linux-gnu-objcopy --only-keep-debug /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/Exception/Exception/DEBUG/Exception.dll /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Exception.debug
+/opt/cross-tools/bin//mipsel-linux-gnu-objcopy --strip-unneeded /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/Exception/Exception/DEBUG/Exception.dll
+/opt/cross-tools/bin//mipsel-linux-gnu-objcopy --add-gnu-debuglink=/home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Exception.debug /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/Exception/Exception/DEBUG/Exception.dll
+GenFw -e SEC -o /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/Exception/Exception/DEBUG/Exception.efi /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/Exception/Exception/DEBUG/Exception.dll
+elf in mips format!cp -f /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/Exception/Exception/DEBUG/Exception.efi /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/Exception/Exception/OUTPUT
+cp -f /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/Exception/Exception/DEBUG/Exception.efi /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64
+cp -f /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/Exception/Exception/DEBUG/*.map /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/Exception/Exception/OUTPUT
+cp: 无法 stat “/home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/Exception/Exception/DEBUG/*.map”: 没有该文件或目录
+make[2]: [/home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64/Fuloong6003Pkg/Sec/Exception/Exception/DEBUG/Exception.efi] 错误 1 (忽略)
+make[2]:正在离开目录 `/home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64'
+make[1]:正在离开目录 `/home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/MIPS64'
+GenFds -f /home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Fuloong6003Pkg.fdf -o /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC -t MIPSELFGCC -b DEBUG -p /home/guobamantou/Desktop/edk2/Fuloong6003Pkg/Fuloong6003Pkg.dsc -a MIPS64  -D "EFI_SOURCE=/home/guobamantou/Desktop/edk2/EdkCompatibilityPkg"  -D "EDK_SOURCE=/home/guobamantou/Desktop/edk2/EdkCompatibilityPkg"  -D "TARGET=DEBUG"
+Fd File Name:SIZE512KB
+
+Generate Region at Offset 0x0
+   Region Size = 0x10000
+   Region Name = FV
+
+Generating FVRECOVERY FV
+########
+Generate Region at Offset 0x10000
+   Region Size = 0x60000
+   Region Name = FV
+
+Generating FVMAIN FV
+#
+Generate Region at Offset 0x70000
+   Region Size = 0x10000
+   Region Name = None
+
+Generate Region at Offset 0x0
+   Region Size = 0x10000
+   Region Name = FV
+
+Generate Region at Offset 0x10000
+   Region Size = 0x60000
+   Region Name = FV
+
+Generate Region at Offset 0x70000
+   Region Size = 0x10000
+   Region Name = None
+
+GUID cross reference file saved to /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/FV/Guid.xref
+
+FV Space Information
+FVRECOVERY [8%Full] 65536 total, 5456 used, 60080 free
+
+- Done -
+09:30:22, Apr.15 2010 [00:02]
+comming out build platfomr
+end launch
+./build.sh: line 51: /home/guobamantou/Desktop/edk2/Build/Fuloong6003/DEBUG_MIPSELFGCC/TOOLS/RecalculateFvZeroVector: 没有该文件或目录

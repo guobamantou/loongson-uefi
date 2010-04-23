@@ -1,0 +1,95 @@
+#
+#
+[FD.Size512KB]
+  BaseAddress       = 0x0|gFuloong6003TokenSpaceGuid.PcdFlashFdBase
+  Size              = 0x80000|gFuloong6003TokenSpaceGuid.PcdFlashFdSize
+  ErasePolarity     = 1
+  BlockSize         = 0x8000
+  NumBlocks         = 0x10
+  
+  #
+  #For Fv Recovery
+  0x00000000|0x00010000
+  gFuloong6003TokenSpaceGuid.PcdFlashFvRecoveryBase|gFuloong6003TokenSpaceGuid.PcdFlashFvRecoverySize
+  FV = FVRECOVERY  
+  
+
+  #
+  #For Fv main
+  0x00010000|0x00060000
+  gFuloong6003TokenSpaceGuid.PcdFlashFvMainBase|gFuloong6003TokenSpaceGuid.PcdFlashMainSize
+  FV = FVMAIN
+
+
+  #
+  #Reserved for Nv Storage
+  0x00070000|0x00010000
+  
+[FV.FVRECOVERY]
+  BlockSize             = 0x8000
+  NumBlocks             = 0x2
+  FvAlignment           = 32         
+  ERASE_POLARITY        = 1
+  MEMORY_MAPPED         = TRUE
+  STICKY_WRITE          = TRUE
+  LOCK_CAP              = TRUE
+  LOCK_STATUS           = TRUE
+  WRITE_DISABLED_CAP    = TRUE
+  WRITE_ENABLED_CAP     = TRUE
+  WRITE_STATUS          = TRUE
+  WRITE_LOCK_CAP        = TRUE
+  WRITE_LOCK_STATUS     = TRUE
+  READ_DISABLED_CAP     = TRUE
+  READ_ENABLED_CAP      = TRUE
+  READ_STATUS           = TRUE
+  READ_LOCK_CAP         = TRUE
+  READ_LOCK_STATUS      = TRUE
+
+  FILE FREEFORM = 20c8f1f2-5f98-4860-a1e7-8ef73b27e46b {
+    SECTION RAW = Fuloong6003Pkg/Sec/Exception/Exception.pad
+    SECTION RAW = Fuloong6003Pkg/Sec/Exception/Exception.bin
+  }
+  INF Fuloong6003Pkg/Sec/SecCore.inf
+  
+[FV.FVMAIN]
+  BlockSize                 = 0x8000
+  NumBlocks                 = 0xC
+  FvAlignment               = 32          
+  ERASE_POLARITY            = 1
+  MEMORY_MAPPED             = TRUE
+  STICKY_WRITE              = TRUE
+  LOCK_CAP                  = TRUE
+  LOCK_STATUS               = TRUE
+  WRITE_DISABLED_CAP        = TRUE
+  WRITE_ENABLED_CAP         = TRUE
+  WRITE_STATUS              = TRUE
+  WRITE_LOCK_CAP            = TRUE
+  WRITE_LOCK_STATUS         = TRUE
+  READ_DISABLED_CAP         = TRUE
+  READ_ENABLED_CAP          = TRUE
+  READ_STATUS               = TRUE
+  READ_LOCK_CAP             = TRUE
+  READ_LOCK_STATUS          = TRUE
+
+
+
+
+[Rule.Common.SEC]
+  FILE SEC = $(NAMED_GUID) RELOCS_STRIPPED {
+    TE  TE    Align = 8      |.efi
+  }
+
+[Rule.Common.PEI_CORE]
+  FILE PEI_CORE = $(NAMED_GUID) {
+    TE     TE           |.efi
+    UI     STRING ="$(MODULE_NAME)" Optional         
+  }
+
+[Rule.Common.PEIM]
+  FILE PEIM = $(NAMED_GUID) {
+     PEI_DEPEX PEI_DEPEX Optional        |.depex
+     PE32      PE32                      |.efi
+     UI       STRING="$(MODULE_NAME)" Optional         
+  }
+
+
