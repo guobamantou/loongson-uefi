@@ -363,8 +363,8 @@ DEFINE GCC44_ASM_FLAGS               = DEF(GCC_ASM_FLAGS)
 *_MIPSELFGCC_*_*_FAMILY                 = GCC
 *_MIPSELFGCC_*_MAKE_PATH                = make
 
-*_MIPSELFGCC_*_PP_FLAGS                     = -E -x -mno-abicalls assembler-with-cpp -include AutoGen.h
-*_MIPSELFGCC_*_VFRPP_FLAGS                  = -x c -E -P -DVFRCOMPILE --include $(MODULE_NAME)StrDefs.h
+*_MIPSELFGCC_*_PP_FLAGS                     = -E -x -mabi=64 -mno-abicalls assembler-with-cpp -include AutoGen.h
+*_MIPSELFGCC_*_VFRPP_FLAGS                  = -x c -E -mabi=64 -P -DVFRCOMPILE --include $(MODULE_NAME)StrDefs.h
 
 ##################
 # ASL definitions
@@ -390,11 +390,11 @@ DEFINE GCC44_ASM_FLAGS               = DEF(GCC_ASM_FLAGS)
 *_MIPSELFGCC32_MIPS64_ASLDLINK_PATH       = DEF(MIPSELFGCC_BIN)/mipsel-linux-gnu-ld
 *_MIPSELFGCC_MIPS64_RC_PATH               = DEF(MIPSELFGCC_BIN)/mipsel-linux-gnu-objcopy
 
-*_MIPSELFGCC_MIPS64_CC_FLAGS              = -mips3 -g -mno-abicalls -Os -fshort-wchar -fno-strict-aliasing -Wall -Wstrict-prototypes -Wno-trigraphs -Werror-implicit-function-declaration -Wstrict-aliasing -fno-common -ffreestanding -fno-builtin -pipe -nostdlib -c -include $(DEST_DIR_DEBUG)/AutoGen.h -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
+*_MIPSELFGCC_MIPS64_CC_FLAGS              = -mips3 -g -mabi=64 -mno-abicalls -Os -fshort-wchar -fno-strict-aliasing -Wall -Wstrict-prototypes -Wno-trigraphs -Werror-implicit-function-declaration -Wstrict-aliasing -fno-common -ffreestanding -fno-builtin -pipe -nostdlib -c -include $(DEST_DIR_DEBUG)/AutoGen.h -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
 *_MIPSELFGCC_MIPS64_SLINK_FLAGS           =
-*_MIPSELFGCC_MIPS64_DLINK_FLAGS           = -melf32ltsmip  -nostdlib --entry $(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT)
-*_MIPSELFGCC_MIPS64_ASM_FLAGS             = 
-*_MIPSELFGCC_MIPS64_PP_FLAGS              = -mips3 -E  -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
+*_MIPSELFGCC_MIPS64_DLINK_FLAGS           = -melf64ltsmip  -nostdlib --entry $(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT)
+*_MIPSELFGCC_MIPS64_ASM_FLAGS             = -mabi=64
+*_MIPSELFGCC_MIPS64_PP_FLAGS              = -mips3 -E -mabi=64 -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
 *_MIPSELFGCC_MIPS64_VFRPP_FLAGS           = -x c -E -P -DVFRCOMPILE --include $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h
 *_MIPSELFGCC_MIPS64_RC_FLAGS              = DEF(GCC_MIPS64_RC_FLAGS)
 *_MIPSELFGCC_MIPS64_OBJCOPY_FLAGS         =
@@ -465,9 +465,9 @@ DEFINE GCC44_ASM_FLAGS               = DEF(GCC_ASM_FLAGS)
 
 *_ELFGCC_MIPS64_CC_FLAGS              = -mips3 -g  -fshort-wchar -fno-strict-aliasing -Wall -c -include $(DEST_DIR_DEBUG)/AutoGen.h -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
 *_ELFGCC_MIPS64_SLINK_FLAGS           =
-*_ELFGCC_MIPS64_DLINK_FLAGS           = -melf32ltsmip  -nostdlib --entry $(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT)
+*_ELFGCC_MIPS64_DLINK_FLAGS           = -melf64ltsmip  -nostdlib --entry $(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT)
 *_ELFGCC_MIPS64_ASM_FLAGS             = -mips3 -c  -x assembler -imacros $(DEST_DIR_DEBUG)/AutoGen.h
-*_ELFGCC_MIPS64_PP_FLAGS              = -mips3 -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
+*_ELFGCC_MIPS64_PP_FLAGS              = -mips3 -E -mabi=64 -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
 *_ELFGCC_MIPS64_VFRPP_FLAGS           = -x c -E -P -DVFRCOMPILE --include $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h
 *_ELFGCC_MIPS64_RC_FLAGS              = DEF(GCC_MIPS64_RC_FLAGS)
 *_ELFGCC_MIPS64_OBJCOPY_FLAGS         =

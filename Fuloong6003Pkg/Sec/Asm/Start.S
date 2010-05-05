@@ -31,7 +31,8 @@
 	nop
 
 /************************   start here  ************************/
-stack = 0xffffffff90000000-0x100000
+stack = 0xffffffff90000000
+
 _ModuleEntryPoint:
 	mtc0	zero, CP0_STATUS 
 	mtc0	zero, CP0_CAUSE 

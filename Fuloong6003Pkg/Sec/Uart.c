@@ -4,7 +4,7 @@
 
 #define CONS_BAUD B115200
 
-#define PHY_TO_UNCACHED(p)      ((p)|0xa0000000)
+#define PHY_TO_UNCACHED(p)      ((p)|0xffffffffa0000000)
 
 u8* UART_BASE = (u8 *)PHY_TO_UNCACHED(UART_ADDR);
 

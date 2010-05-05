@@ -241,6 +241,7 @@ typedef struct {
 #define SHT_HIOS		0x6fffffff	/* Last of OS specific semantics */
 #define SHT_LOPROC		0x70000000	/* reserved range for processor */
 #define SHT_AMD64_UNWIND	0x70000001	/* unwind information */
+#define SHT_MIPS_OPTION		0x7000000d      /* mips information add by xiangy@lemote.com*/
 #define SHT_HIPROC		0x7fffffff	/* specific section header types */
 #define SHT_LOUSER		0x80000000	/* reserved range for application */
 #define SHT_HIUSER		0xffffffff	/* specific indexes */

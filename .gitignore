@@ -6,5 +6,7 @@
 # *~
 *.pyc
 *.efi
+*.fd
+tags
 Build/
 Fuloong6003Pkg/Sec/Exception/Build/

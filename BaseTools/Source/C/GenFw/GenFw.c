@@ -482,12 +482,25 @@ IsElfHeader(
     && FileBuffer[EI_MAG3] == ELFMAG3);
 }
 
+// macro MIPS64ELF is used when the input file is elf64 in mips instruction
+#define MIPS64ELF 
+
+#ifndef MIPS64ELF 
 typedef Elf32_Shdr Elf_Shdr;
 typedef Elf32_Ehdr Elf_Ehdr;
 typedef Elf32_Rel Elf_Rel;
 typedef Elf32_Sym Elf_Sym;
 typedef Elf32_Phdr Elf_Phdr;
 typedef Elf32_Dyn Elf_Dyn;
+#else
+typedef Elf64_Shdr Elf_Shdr;
+typedef Elf64_Ehdr Elf_Ehdr;
+typedef Elf64_Rel Elf_Rel;
+typedef Elf64_Sym Elf_Sym;
+typedef Elf64_Phdr Elf_Phdr;
+typedef Elf64_Dyn Elf_Dyn;
+#endif
+
 
 #define ELFCLASS ELFCLASS32
 #define ELF_R_TYPE(r) ELF32_R_TYPE(r)
@@ -559,9 +572,18 @@ CheckElfHeader(
   //
   // Note: Magic has already been tested.
   //
+#ifdef MIPS64ELF
+  int elf64_flag = 0;
+#endif
+
   if (Ehdr->e_ident[EI_CLASS] != ELFCLASS) {
+#ifdef MIPS64ELF
+    printf("64-bits ELF\n");
+    elf64_flag = 1;
+#else
     Error (NULL, 0, 3000, "Unsupported", "%s needs to be ported for 64-bit ELF.", mInImageName);
     return 0;
+#endif
   }
   if (Ehdr->e_ident[EI_DATA] != ELFDATA2LSB) {
     Error (NULL, 0, 3000, "Unsupported", "ELF EI_DATA not ELFDATA2LSB");
@@ -588,8 +610,18 @@ CheckElfHeader(
   //
   // Find the section header table
   //
+#ifdef MIPS64ELF
+  if (!elf64_flag) {
+    ShdrBase  = (Elf32_Shdr *)((UINT8 *)Ehdr + Ehdr->e_shoff);
+    gPhdrBase = (Elf32_Phdr *)((UINT8 *)Ehdr + Ehdr->e_phoff);
+  } else {
+    ShdrBase  = (Elf64_Shdr *)((UINT8 *)Ehdr + Ehdr->e_shoff);
+    gPhdrBase = (Elf64_Phdr *)((UINT8 *)Ehdr + Ehdr->e_phoff);
+  }
+#else
   ShdrBase  = (Elf_Shdr *)((UINT8 *)Ehdr + Ehdr->e_shoff);
   gPhdrBase = (Elf_Phdr *)((UINT8 *)Ehdr + Ehdr->e_phoff);
+#endif
 
   CoffSectionsOffset = (UINT32 *)malloc(Ehdr->e_shnum * sizeof (UINT32));
 
@@ -715,6 +747,7 @@ SetHiiResourceHeader (
   return;
 }
 
+
 VOID
 ScanSections(
   VOID
@@ -740,10 +773,11 @@ ScanSections(
 	break;
   case EM_X86_64:
   case EM_IA_64:
+  case EM_MIPS:
     CoffOffset += sizeof (EFI_IMAGE_NT_HEADERS64);
 	break;
   default:
-    VerboseMsg ("%s unknown e_machine type. Assume IA-32", (UINTN)Ehdr->e_machine);
+    VerboseMsg ("%d unknown e_machine type. Assume IA-32", (UINTN)Ehdr->e_machine);
     CoffOffset += sizeof (EFI_IMAGE_NT_HEADERS32);
 	break;
   }
@@ -860,7 +894,11 @@ ScanSections(
 
   NtHdr = (EFI_IMAGE_OPTIONAL_HEADER_UNION*)(CoffFile + NtHdrOffset);
 
+#ifdef MIPS64ELF
+  NtHdr->Pe32Plus.Signature = EFI_IMAGE_NT_SIGNATURE;
+#else
   NtHdr->Pe32.Signature = EFI_IMAGE_NT_SIGNATURE;
+#endif
 
   switch (Ehdr->e_machine) {
   case EM_386:
@@ -875,16 +913,86 @@ ScanSections(
     NtHdr->Pe32.FileHeader.Machine = EFI_IMAGE_MACHINE_IPF;
     NtHdr->Pe32.OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
     break;
+#ifdef MIPS64ELF
+  case EM_MIPS: /* changed by xiangy, loongson use 64bit, so use pe32+ format*/
+    NtHdr->Pe32Plus.FileHeader.Machine = EFI_IMAGE_MACHINE_MIPS;
+    NtHdr->Pe32Plus.OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
+    break;
+#endif
   case EM_ARM:
     NtHdr->Pe32.FileHeader.Machine = EFI_IMAGE_MACHINE_ARMT;
     NtHdr->Pe32.OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC;
     break;
   default:
-    VerboseMsg ("%s unknown e_machine type. Assume IA-32", (UINTN)Ehdr->e_machine);
+    VerboseMsg ("%d unknown e_machine type. Assume IA-32", (UINTN)Ehdr->e_machine);
     NtHdr->Pe32.FileHeader.Machine = EFI_IMAGE_MACHINE_IA32;
     NtHdr->Pe32.OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC;
   }
 
+#ifdef MIPS64ELF
+  NtHdr->Pe32Plus.FileHeader.NumberOfSections = CoffNbrSections;
+  NtHdr->Pe32Plus.FileHeader.TimeDateStamp = (UINT32) time(NULL);
+  mImageTimeStamp = NtHdr->Pe32Plus.FileHeader.TimeDateStamp;
+  NtHdr->Pe32Plus.FileHeader.PointerToSymbolTable = 0;
+  NtHdr->Pe32Plus.FileHeader.NumberOfSymbols = 0;
+  NtHdr->Pe32Plus.FileHeader.SizeOfOptionalHeader = sizeof(NtHdr->Pe32Plus.OptionalHeader);
+  NtHdr->Pe32Plus.FileHeader.Characteristics = EFI_IMAGE_FILE_EXECUTABLE_IMAGE
+    | EFI_IMAGE_FILE_LINE_NUMS_STRIPPED
+    | EFI_IMAGE_FILE_LOCAL_SYMS_STRIPPED;
+  //| EFI_IMAGE_FILE_32BIT_MACHINE
+
+  NtHdr->Pe32Plus.OptionalHeader.SizeOfCode = DataOffset - TextOffset;
+  NtHdr->Pe32Plus.OptionalHeader.SizeOfInitializedData = RelocOffset - DataOffset;
+  NtHdr->Pe32Plus.OptionalHeader.SizeOfUninitializedData = 0;
+  NtHdr->Pe32Plus.OptionalHeader.AddressOfEntryPoint = CoffEntry;
+
+  NtHdr->Pe32Plus.OptionalHeader.BaseOfCode = TextOffset;
+
+//NtHdr->Pe32Plus.OptionalHeader.BaseOfData = DataOffset;
+  NtHdr->Pe32Plus.OptionalHeader.ImageBase = 0;
+  NtHdr->Pe32Plus.OptionalHeader.SectionAlignment = CoffAlignment;
+  NtHdr->Pe32Plus.OptionalHeader.FileAlignment = CoffAlignment;
+  NtHdr->Pe32Plus.OptionalHeader.SizeOfImage = 0;
+
+  NtHdr->Pe32Plus.OptionalHeader.SizeOfHeaders = TextOffset;
+  NtHdr->Pe32Plus.OptionalHeader.NumberOfRvaAndSizes = EFI_IMAGE_NUMBER_OF_DIRECTORY_ENTRIES;
+
+  //
+  // Section headers.
+  //
+  if ((DataOffset - TextOffset) > 0) {
+    CreateSectionHeader (".text", TextOffset, DataOffset - TextOffset,
+            EFI_IMAGE_SCN_CNT_CODE
+            | EFI_IMAGE_SCN_MEM_EXECUTE
+            | EFI_IMAGE_SCN_MEM_READ);
+  } else {
+    // Don't make a section of size 0. 
+    NtHdr->Pe32Plus.FileHeader.NumberOfSections--;
+  }
+
+  if ((HiiRsrcOffset - DataOffset) > 0) {
+    CreateSectionHeader (".data", DataOffset, HiiRsrcOffset - DataOffset,
+            EFI_IMAGE_SCN_CNT_INITIALIZED_DATA
+            | EFI_IMAGE_SCN_MEM_WRITE
+            | EFI_IMAGE_SCN_MEM_READ);
+  } else {
+    // Don't make a section of size 0. 
+    NtHdr->Pe32Plus.FileHeader.NumberOfSections--;
+  }
+
+  if ((RelocOffset - HiiRsrcOffset) > 0) {
+    CreateSectionHeader (".rsrc", HiiRsrcOffset, RelocOffset - HiiRsrcOffset,
+            EFI_IMAGE_SCN_CNT_INITIALIZED_DATA
+            | EFI_IMAGE_SCN_MEM_READ);
+
+    NtHdr->Pe32Plus.OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_RESOURCE].Size = RelocOffset - HiiRsrcOffset;
+    NtHdr->Pe32Plus.OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_RESOURCE].VirtualAddress = HiiRsrcOffset;
+  } else {
+    // Don't make a section of size 0. 
+    NtHdr->Pe32Plus.FileHeader.NumberOfSections--;
+  }
+
+#else
   NtHdr->Pe32.FileHeader.NumberOfSections = CoffNbrSections;
   NtHdr->Pe32.FileHeader.TimeDateStamp = (UINT32) time(NULL);
   mImageTimeStamp = NtHdr->Pe32.FileHeader.TimeDateStamp;
@@ -946,7 +1054,7 @@ ScanSections(
     // Don't make a section of size 0. 
     NtHdr->Pe32.FileHeader.NumberOfSections--;
   }
-
+#endif
 }
 
 VOID
@@ -966,6 +1074,9 @@ WriteSections(
     if ((*Filter)(Shdr)) {
       switch (Shdr->sh_type) {
       case SHT_PROGBITS:
+#ifdef MIPS64ELF
+      case SHT_MIPS_OPTION:
+#endif
         /* Copy.  */
         memcpy(CoffFile + CoffSectionsOffset[Idx],
               (UINT8*)Ehdr + Shdr->sh_offset,
@@ -1344,10 +1455,15 @@ ConvertElf (
   // Check header, read section table.
   //
   Ehdr = (Elf32_Ehdr*)*FileBuffer;
+#ifdef MIPS64ELF
+  if (Ehdr->e_ident[EI_CLASS] != ELFCLASS) {
+    Ehdr = (Elf64_Ehdr*)*FileBuffer;
+  }
+#endif
   if (!CheckElfHeader())
     return;
 
-  VerboseMsg ("Check Efl Image Header");
+  VerboseMsg ("Check Elf Image Header");
   //
   // Compute sections new address.
   //
@@ -1377,8 +1493,11 @@ ConvertElf (
   VerboseMsg ("Write debug info.");
 
   NtHdr = (EFI_IMAGE_OPTIONAL_HEADER_UNION *)(CoffFile + NtHdrOffset);
+#ifdef MIPS64ELF
+  NtHdr->Pe32Plus.OptionalHeader.SizeOfImage = CoffOffset;
+#else
   NtHdr->Pe32.OptionalHeader.SizeOfImage = CoffOffset;
-
+#endif
   //
   // Replace.
   //
@@ -1446,6 +1565,107 @@ PeCoffConvertImageToXip (
     return;
   }
   
+#ifdef MIPS64ELF
+  if (PeHdr->Pe32Plus.OptionalHeader.SectionAlignment != PeHdr->Pe32Plus.OptionalHeader.FileAlignment) {
+    //
+    // The only reason to expand zero fill sections is to make them compatible with XIP images.
+    // If SectionAlignment is not equal to FileAlginment then it is not an XIP type image.
+    //
+    return;
+  }
+
+  //
+  // Calculate size of XIP file, and determine if the conversion is needed.
+  //
+  ConversionNeeded = FALSE;
+  XipLength = 0;
+  FirstSectionOffset = *FileLength;
+  TotalNecessaryFileSize = 0;
+  SectionHeader = (EFI_IMAGE_SECTION_HEADER *) ((UINT8 *) &(PeHdr->Pe32Plus.OptionalHeader) + PeHdr->Pe32Plus.FileHeader.SizeOfOptionalHeader);
+  for (Index = 0; Index < PeHdr->Pe32Plus.FileHeader.NumberOfSections; Index ++, SectionHeader ++) {
+    SectionSize = MAX (SectionHeader->Misc.VirtualSize, SectionHeader->SizeOfRawData);
+    TotalNecessaryFileSize += SectionSize;
+    if (SectionSize > 0) {
+      FirstSectionOffset = MIN (FirstSectionOffset, SectionHeader->VirtualAddress);
+      XipLength = MAX (XipLength, SectionHeader->VirtualAddress + SectionSize);
+      if (SectionHeader->VirtualAddress != SectionHeader->PointerToRawData) {
+        ConversionNeeded = TRUE;
+      }
+    }
+    if (SectionHeader->Misc.VirtualSize > SectionHeader->SizeOfRawData) {
+      ConversionNeeded = TRUE;
+    }
+  }
+
+  if (FirstSectionOffset < PeHdr->Pe32Plus.OptionalHeader.SizeOfHeaders) {
+    //
+    // If one of the sections should be loaded to an offset overlapping with
+    // the executable header, then it cannot be made into an XIP image.
+    //
+    VerboseMsg ("PE/COFF conversion to XIP is impossible due to overlap");
+    VerboseMsg ("of section data with the executable header.");
+    return;
+  }
+
+  if (FirstSectionOffset == *FileLength) {
+    //
+    // If we never found a section with a non-zero size, then we
+    // skip the conversion.
+    //
+    return;
+  }
+
+  TotalNecessaryFileSize += FirstSectionOffset;
+
+  if (!ConversionNeeded) {
+    return;
+  }
+
+  if (XipLength > (2 * TotalNecessaryFileSize)) {
+    VerboseMsg ("PE/COFF conversion to XIP appears to be larger than necessary.");
+    VerboseMsg ("The image linking process may have left unused memory ranges.");
+  }
+
+  if (PeHdr->Pe32Plus.FileHeader.PointerToSymbolTable != 0) {
+    //
+    // This field is obsolete and should be zero
+    //
+    PeHdr->Pe32Plus.FileHeader.PointerToSymbolTable = 0;
+  }
+
+  //
+  // Allocate the extra space that we need to grow the image
+  //
+  XipFile = malloc (XipLength);
+  memset (XipFile, 0, XipLength);
+
+  //
+  // Copy the file headers
+  //
+  memcpy (XipFile, *FileBuffer, PeHdr->Pe32Plus.OptionalHeader.SizeOfHeaders);
+
+  NewPeHdr = GetPeCoffHeader ((void *)XipFile);
+  if (NewPeHdr == NULL) {
+    free (XipFile);
+    return;
+  }
+
+  //
+  // Copy the section data over to the appropriate XIP offsets
+  //
+  SectionHeader = (EFI_IMAGE_SECTION_HEADER *) ((UINT8 *) &(NewPeHdr->Pe32Plus.OptionalHeader) + NewPeHdr->Pe32Plus.FileHeader.SizeOfOptionalHeader);
+  for (Index = 0; Index < PeHdr->Pe32Plus.FileHeader.NumberOfSections; Index ++, SectionHeader ++) {
+    if (SectionHeader->SizeOfRawData > 0) {
+      memcpy (
+        XipFile + SectionHeader->VirtualAddress,
+        *FileBuffer + SectionHeader->PointerToRawData,
+        SectionHeader->SizeOfRawData
+        );
+    }
+    SectionHeader->SizeOfRawData = SectionHeader->Misc.VirtualSize;
+    SectionHeader->PointerToRawData = SectionHeader->VirtualAddress;
+  }
+#else
   if (PeHdr->Pe32.OptionalHeader.SectionAlignment != PeHdr->Pe32.OptionalHeader.FileAlignment) {
     //
     // The only reason to expand zero fill sections is to make them compatible with XIP images.
@@ -1546,6 +1766,7 @@ PeCoffConvertImageToXip (
     SectionHeader->PointerToRawData = SectionHeader->VirtualAddress;
   }
 
+#endif
   free (*FileBuffer);
   *FileLength = XipLength;
   *FileBuffer = XipFile;

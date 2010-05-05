@@ -25,9 +25,11 @@
 # Please reference edk2 user manual for more detail descriptions at https://edk2.tianocore.org/files/documents/64/494/EDKII_UserManual.pdf
 #
 
-#export EDK_TOOLS_PATH=/home/guobamantou/Desktop/edk2/BaseTools/
+#export EDK_TOOLS_PATH=/home/guobamantou/loongson-uefi/BaseTools/
   . BaseTools/BuildEnv BaseTools
-
+cd BaseTools/
+make 
+cd -
 cd Fuloong6003Pkg
 #cd UnixPkg
 #. build.sh

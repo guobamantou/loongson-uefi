@@ -5,7 +5,7 @@ PROJECT_FD_IMAGE_NAME=SIZE512KB.fd
 
 cd ..
 
-source edksetup.sh
+#source edksetup.sh
 
 PROJECT_TOOLS_SRC_DIR=$PROJECT_ROOT_DIR/Tools
 PROJECT_PLATFORM_NAME=Fuloong6003
@@ -15,10 +15,10 @@ PROJECT_BUILD_TOOLS_DIR=$PROJECT_BUILD_DIR/TOOLS
 
 if [ $1 = "clean" ]; then
     cd ../BaseTools/
-    make clean;make
+    make clean;
     cd -
     rm -rf ../Build
-    build -t MIPSELFGCC -p ${PROJECT_PLATFORM_NAME}Pkg/${PROJECT_PLATFORM_NAME}Pkg.dsc -a MIPS64 clean
+  #  build -t MIPSELFGCC -p ${PROJECT_PLATFORM_NAME}Pkg/${PROJECT_PLATFORM_NAME}Pkg.dsc -a MIPS64 clean
     cd $PROJECT_ROOT_DIR
     return
 fi

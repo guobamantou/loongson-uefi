@@ -2,7 +2,7 @@ OUTPUT_ARCH(mips)
 ENTRY(_ModuleEntryPoint)
 SECTIONS
 {
-  . = 0xffffffffbfc00590;
+  . = 0xffffffffbfc005a0;
   .text :
   {
     _ftext = . ;
