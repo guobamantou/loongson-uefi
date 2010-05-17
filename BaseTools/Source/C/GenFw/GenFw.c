@@ -817,7 +817,7 @@ ScanSections(
     }
   }
 
-  if (Ehdr->e_machine != EM_ARM) {
+  if ((Ehdr->e_machine != EM_ARM) &&(Ehdr->e_machine != EM_MIPS)) {
     CoffOffset = CoffAlign(CoffOffset);
   }
 
